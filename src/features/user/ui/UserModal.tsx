@@ -1,55 +1,52 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui'
-import type { User } from '@/entities/user/model'
+import { useUserStore } from '@/app/stores'
 
-interface UserModalProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  user: User | null
-  loading?: boolean
-}
-
-export const UserModal: React.FC<UserModalProps> = ({ open, onOpenChange, user, loading = false }) => {
+export const UserModal: React.FC = () => {
+  const showUserModal = useUserStore((state) => state.showUserModal)
+  const setShowUserModal = useUserStore((state) => state.setShowUserModal)
+  const selectedUser = useUserStore((state) => state.selectedUser)
+  const loading = useUserStore((state) => state.loading)
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={showUserModal} onOpenChange={setShowUserModal}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>사용자 정보</DialogTitle>
         </DialogHeader>
         {loading ? (
           <div className="flex justify-center p-4">로딩 중...</div>
-        ) : user ? (
+        ) : selectedUser ? (
           <div className="space-y-4">
-            <img src={user.image} alt={user.username} className="w-24 h-24 rounded-full mx-auto" />
-            <h3 className="text-xl font-semibold text-center">{user.username}</h3>
+            <img src={selectedUser.image} alt={selectedUser.username} className="w-24 h-24 rounded-full mx-auto" />
+            <h3 className="text-xl font-semibold text-center">{selectedUser.username}</h3>
             <div className="space-y-2">
-              {user.firstName && user.lastName && (
+              {selectedUser.firstName && selectedUser.lastName && (
                 <p>
-                  <strong>이름:</strong> {user.firstName} {user.lastName}
+                  <strong>이름:</strong> {selectedUser.firstName} {selectedUser.lastName}
                 </p>
               )}
-              {user.age && (
+              {selectedUser.age && (
                 <p>
-                  <strong>나이:</strong> {user.age}
+                  <strong>나이:</strong> {selectedUser.age}
                 </p>
               )}
-              {user.email && (
+              {selectedUser.email && (
                 <p>
-                  <strong>이메일:</strong> {user.email}
+                  <strong>이메일:</strong> {selectedUser.email}
                 </p>
               )}
-              {user.phone && (
+              {selectedUser.phone && (
                 <p>
-                  <strong>전화번호:</strong> {user.phone}
+                  <strong>전화번호:</strong> {selectedUser.phone}
                 </p>
               )}
-              {user.address && (
+              {selectedUser.address && (
                 <p>
-                  <strong>주소:</strong> {user.address.address}, {user.address.city}, {user.address.state}
+                  <strong>주소:</strong> {selectedUser.address.address}, {selectedUser.address.city}, {selectedUser.address.state}
                 </p>
               )}
-              {user.company && (
+              {selectedUser.company && (
                 <p>
-                  <strong>직장:</strong> {user.company.name} - {user.company.title}
+                  <strong>직장:</strong> {selectedUser.company.name} - {selectedUser.company.title}
                 </p>
               )}
             </div>

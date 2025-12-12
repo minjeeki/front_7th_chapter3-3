@@ -15,8 +15,6 @@ import { parseURLParams } from "@/shared/lib"
 
 const PostsManager = () => {
   const location = useLocation()
-
-  // Zustand 스토어 사용
   const postsStore = usePostsStore()
   const commentsStore = useCommentsStore()
   const userStore = useUserStore()
@@ -103,65 +101,27 @@ const PostsManager = () => {
       </CardContent>
 
       {/* 게시물 추가 대화상자 */}
-      <AddPostDialog
-        open={postsStore.showAddDialog}
-        onOpenChange={postsStore.setShowAddDialog}
-        newPost={postsStore.newPost}
-        setNewPost={postsStore.setNewPost}
-        onAdd={postsStore.addPost}
-      />
+      <AddPostDialog />
 
       {/* 게시물 수정 대화상자 */}
-      <EditPostDialog
-        open={postsStore.showEditDialog}
-        onOpenChange={postsStore.setShowEditDialog}
-        selectedPost={postsStore.selectedPost}
-        setSelectedPost={postsStore.setSelectedPost}
-        onUpdate={postsStore.updatePost}
-      />
+      <EditPostDialog />
 
       {/* 댓글 추가 대화상자 */}
-      <AddCommentDialog
-        open={commentsStore.showAddDialog}
-        onOpenChange={commentsStore.setShowAddDialog}
-        newComment={commentsStore.newComment}
-        setNewComment={commentsStore.setNewComment}
-        onAdd={commentsStore.addComment}
-      />
+      <AddCommentDialog />
 
       {/* 댓글 수정 대화상자 */}
-      <EditCommentDialog
-        open={commentsStore.showEditDialog}
-        onOpenChange={commentsStore.setShowEditDialog}
-        selectedComment={commentsStore.selectedComment}
-        setSelectedComment={commentsStore.setSelectedComment}
-        onUpdate={commentsStore.updateComment}
-      />
+      <EditCommentDialog />
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailDialog
         open={postsStore.showPostDetailDialog}
         onOpenChange={postsStore.setShowPostDetailDialog}
         post={postsStore.selectedPost}
-        comments={
-          postsStore.selectedPost
-            ? commentsStore.comments[postsStore.selectedPost.id] || []
-            : []
-        }
         searchQuery={postsStore.searchQuery}
-        onAddCommentClick={commentsStore.openAddDialog}
-        onEditCommentClick={commentsStore.openEditDialog}
-        onDeleteCommentClick={commentsStore.deleteComment}
-        onLikeCommentClick={commentsStore.likeComment}
       />
 
       {/* 사용자 모달 */}
-      <UserModal
-        open={userStore.showUserModal}
-        onOpenChange={userStore.setShowUserModal}
-        user={userStore.selectedUser}
-        loading={userStore.loading}
-      />
+      <UserModal />
     </Card>
   )
 }

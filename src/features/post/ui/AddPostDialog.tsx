@@ -1,23 +1,14 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Input, Textarea, Button } from '@/shared/ui'
-import type { CreatePostDto } from '@/entities/post/model'
+import { usePostsStore } from '@/app/stores'
 
-interface AddPostDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  newPost: CreatePostDto
-  setNewPost: (post: CreatePostDto) => void
-  onAdd: () => void
-}
-
-export const AddPostDialog: React.FC<AddPostDialogProps> = ({
-  open,
-  onOpenChange,
-  newPost,
-  setNewPost,
-  onAdd,
-}) => {
+export const AddPostDialog: React.FC = () => {
+  const showAddDialog = usePostsStore((state) => state.showAddDialog)
+  const setShowAddDialog = usePostsStore((state) => state.setShowAddDialog)
+  const newPost = usePostsStore((state) => state.newPost)
+  const setNewPost = usePostsStore((state) => state.setNewPost)
+  const addPost = usePostsStore((state) => state.addPost)
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 게시물 추가</DialogTitle>
@@ -40,7 +31,7 @@ export const AddPostDialog: React.FC<AddPostDialogProps> = ({
             value={newPost.userId}
             onChange={(e) => setNewPost({ ...newPost, userId: Number(e.target.value) })}
           />
-          <Button onClick={onAdd}>게시물 추가</Button>
+          <Button onClick={addPost}>게시물 추가</Button>
         </div>
       </DialogContent>
     </Dialog>

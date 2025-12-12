@@ -1,25 +1,17 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Textarea, Button } from '@/shared/ui'
-import type { Comment } from '@/entities/comment/model'
+import { useCommentsStore } from '@/app/stores'
 
-interface EditCommentDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  selectedComment: Comment | null
-  setSelectedComment: (comment: Comment | null) => void
-  onUpdate: () => void
-}
-
-export const EditCommentDialog: React.FC<EditCommentDialogProps> = ({
-  open,
-  onOpenChange,
-  selectedComment,
-  setSelectedComment,
-  onUpdate,
-}) => {
+export const EditCommentDialog: React.FC = () => {
+  const showEditDialog = useCommentsStore((state) => state.showEditDialog)
+  const setShowEditDialog = useCommentsStore((state) => state.setShowEditDialog)
+  const selectedComment = useCommentsStore((state) => state.selectedComment)
+  const setSelectedComment = useCommentsStore((state) => state.setSelectedComment)
+  const updateComment = useCommentsStore((state) => state.updateComment)
+  
   if (!selectedComment) return null
 
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={showEditDialog} onOpenChange={setShowEditDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>댓글 수정</DialogTitle>
@@ -30,7 +22,7 @@ export const EditCommentDialog: React.FC<EditCommentDialogProps> = ({
             value={selectedComment.body}
             onChange={(e) => setSelectedComment({ ...selectedComment, body: e.target.value })}
           />
-          <Button onClick={onUpdate}>댓글 업데이트</Button>
+          <Button onClick={updateComment}>댓글 업데이트</Button>
         </div>
       </DialogContent>
     </Dialog>

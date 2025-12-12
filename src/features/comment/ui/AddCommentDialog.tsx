@@ -1,23 +1,14 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Textarea, Button } from '@/shared/ui'
-import type { CreateCommentDto } from '@/entities/comment/model'
+import { useCommentsStore } from '@/app/stores'
 
-interface AddCommentDialogProps {
-  open: boolean
-  onOpenChange: (open: boolean) => void
-  newComment: CreateCommentDto
-  setNewComment: (comment: CreateCommentDto) => void
-  onAdd: () => void
-}
-
-export const AddCommentDialog: React.FC<AddCommentDialogProps> = ({
-  open,
-  onOpenChange,
-  newComment,
-  setNewComment,
-  onAdd,
-}) => {
+export const AddCommentDialog: React.FC = () => {
+  const showAddDialog = useCommentsStore((state) => state.showAddDialog)
+  const setShowAddDialog = useCommentsStore((state) => state.setShowAddDialog)
+  const newComment = useCommentsStore((state) => state.newComment)
+  const setNewComment = useCommentsStore((state) => state.setNewComment)
+  const addComment = useCommentsStore((state) => state.addComment)
   return (
-    <Dialog open={open} onOpenChange={onOpenChange}>
+    <Dialog open={showAddDialog} onOpenChange={setShowAddDialog}>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>새 댓글 추가</DialogTitle>
@@ -28,7 +19,7 @@ export const AddCommentDialog: React.FC<AddCommentDialogProps> = ({
             value={newComment.body}
             onChange={(e) => setNewComment({ ...newComment, body: e.target.value })}
           />
-          <Button onClick={onAdd}>댓글 추가</Button>
+          <Button onClick={addComment}>댓글 추가</Button>
         </div>
       </DialogContent>
     </Dialog>
