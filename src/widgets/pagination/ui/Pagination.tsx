@@ -1,4 +1,3 @@
-import { useMemo } from 'react'
 import { Button, Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/shared/ui'
 
 interface PaginationProps {
