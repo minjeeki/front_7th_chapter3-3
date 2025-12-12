@@ -27,6 +27,8 @@ import {
 } from "../components"
 import { fetchPosts as fetchPostsApi, searchPosts as searchPostsApi, fetchPostsByTag as fetchPostsByTagApi, createPost, updatePost as updatePostApi, deletePost as deletePostApi } from "../entities/post/api"
 import type { Post, CreatePostDto } from "../entities/post/model"
+import { fetchUser, fetchUsers } from "../entities/user/api"
+import type { User } from "../entities/user/model"
 
 const PostsManager = () => {
   const navigate = useNavigate()
@@ -55,7 +57,7 @@ const PostsManager = () => {
   const [showEditCommentDialog, setShowEditCommentDialog] = useState(false)
   const [showPostDetailDialog, setShowPostDetailDialog] = useState(false)
   const [showUserModal, setShowUserModal] = useState(false)
-  const [selectedUser, setSelectedUser] = useState(null)
+  const [selectedUser, setSelectedUser] = useState<User | null>(null)
 
   // URL 업데이트 함수
   const updateURL = () => {
@@ -73,13 +75,14 @@ const PostsManager = () => {
   const fetchPosts = async () => {
     setLoading(true)
     try {
-      const postsData = await fetchPostsApi({ limit, skip })
-      const usersResponse = await fetch("/api/users?limit=0&select=username,image")
-      const usersData = await usersResponse.json()
+      const [postsData, usersData] = await Promise.all([
+        fetchPostsApi({ limit, skip }),
+        fetchUsers({ limit: 0, select: 'username,image' }),
+      ])
       
       const postsWithUsers = postsData.posts.map((post) => ({
         ...post,
-        author: usersData.users.find((user: { id: number }) => user.id === post.userId),
+        author: usersData.users.find((user) => user.id === post.userId),
       }))
       setPosts(postsWithUsers)
       setTotal(postsData.total)
@@ -109,13 +112,14 @@ const PostsManager = () => {
     }
     setLoading(true)
     try {
-      const data = await searchPostsApi(searchQuery)
-      const usersResponse = await fetch("/api/users?limit=0&select=username,image")
-      const usersData = await usersResponse.json()
+      const [data, usersData] = await Promise.all([
+        searchPostsApi(searchQuery),
+        fetchUsers({ limit: 0, select: 'username,image' }),
+      ])
       
       const postsWithUsers = data.posts.map((post) => ({
         ...post,
-        author: usersData.users.find((user: { id: number }) => user.id === post.userId),
+        author: usersData.users.find((user) => user.id === post.userId),
       }))
       setPosts(postsWithUsers)
       setTotal(data.total)
@@ -134,15 +138,14 @@ const PostsManager = () => {
     }
     setLoading(true)
     try {
-      const [postsData, usersResponse] = await Promise.all([
+      const [postsData, usersData] = await Promise.all([
         fetchPostsByTagApi(tag),
-        fetch("/api/users?limit=0&select=username,image"),
+        fetchUsers({ limit: 0, select: 'username,image' }),
       ])
-      const usersData = await usersResponse.json()
 
       const postsWithUsers = postsData.posts.map((post) => ({
         ...post,
-        author: usersData.users.find((user: { id: number }) => user.id === post.userId),
+        author: usersData.users.find((user) => user.id === post.userId),
       }))
 
       setPosts(postsWithUsers)
@@ -285,10 +288,9 @@ const PostsManager = () => {
   }
 
   // 사용자 모달 열기
-  const openUserModal = async (user) => {
+  const openUserModal = async (user: { id: number }) => {
     try {
-      const response = await fetch(`/api/users/${user.id}`)
-      const userData = await response.json()
+      const userData = await fetchUser(user.id)
       setSelectedUser(userData)
       setShowUserModal(true)
     } catch (error) {
@@ -375,10 +377,12 @@ const PostsManager = () => {
               </div>
             </TableCell>
             <TableCell>
-              <div className="flex items-center space-x-2 cursor-pointer" onClick={() => openUserModal(post.author)}>
-                <img src={post.author?.image} alt={post.author?.username} className="w-8 h-8 rounded-full" />
-                <span>{post.author?.username}</span>
-              </div>
+              {post.author && (
+                <div className="flex items-center space-x-2 cursor-pointer" onClick={() => openUserModal(post.author!)}>
+                  <img src={post.author.image} alt={post.author.username} className="w-8 h-8 rounded-full" />
+                  <span>{post.author.username}</span>
+                </div>
+              )}
             </TableCell>
             <TableCell>
               <div className="flex items-center gap-2">
