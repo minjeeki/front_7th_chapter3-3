@@ -48,3 +48,10 @@ export interface PostsQueryParams {
   search?: string
   tag?: string
 }
+
+export interface Tag {
+  url: string
+  slug: string
+}
+
+export type TagsResponse = Tag[]

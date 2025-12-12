@@ -5,4 +5,6 @@ export type {
   UpdatePostDto,
   PostsResponse,
   PostsQueryParams,
+  Tag,
+  TagsResponse,
 } from './types'

@@ -5,4 +5,5 @@ export {
   createPost,
   updatePost,
   deletePost,
+  fetchTags,
 } from './postApi'

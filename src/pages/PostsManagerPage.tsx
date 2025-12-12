@@ -25,8 +25,8 @@ import {
   TableRow,
   Textarea,
 } from "../components"
-import { fetchPosts as fetchPostsApi, searchPosts as searchPostsApi, fetchPostsByTag as fetchPostsByTagApi, createPost, updatePost as updatePostApi, deletePost as deletePostApi } from "../entities/post/api"
-import type { Post, CreatePostDto } from "../entities/post/model"
+import { fetchPosts as fetchPostsApi, searchPosts as searchPostsApi, fetchPostsByTag as fetchPostsByTagApi, createPost, updatePost as updatePostApi, deletePost as deletePostApi, fetchTags as fetchTagsApi } from "../entities/post/api"
+import type { Post, CreatePostDto, Tag } from "../entities/post/model"
 import { fetchUser, fetchUsers } from "../entities/user/api"
 import type { User } from "../entities/user/model"
 import { fetchComments as fetchCommentsApi, createComment, updateComment as updateCommentApi, deleteComment as deleteCommentApi, likeComment as likeCommentApi } from "../entities/comment/api"
@@ -50,7 +50,7 @@ const PostsManager = () => {
   const [showEditDialog, setShowEditDialog] = useState(false)
   const [newPost, setNewPost] = useState<CreatePostDto>({ title: "", body: "", userId: 1 })
   const [loading, setLoading] = useState(false)
-  const [tags, setTags] = useState([])
+  const [tags, setTags] = useState<Tag[]>([])
   const [selectedTag, setSelectedTag] = useState(queryParams.get("tag") || "")
   const [comments, setComments] = useState<Record<number, Comment[]>>({})
   const [selectedComment, setSelectedComment] = useState<Comment | null>(null)
@@ -98,8 +98,7 @@ const PostsManager = () => {
   // 태그 가져오기
   const fetchTags = async () => {
     try {
-      const response = await fetch("/api/posts/tags")
-      const data = await response.json()
+      const data = await fetchTagsApi()
       setTags(data)
     } catch (error) {
       console.error("태그 가져오기 오류:", error)

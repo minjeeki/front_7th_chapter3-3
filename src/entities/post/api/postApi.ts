@@ -1,4 +1,4 @@
-import type { Post, CreatePostDto, UpdatePostDto, PostsResponse, PostsQueryParams } from '../model/types'
+import type { Post, CreatePostDto, UpdatePostDto, PostsResponse, PostsQueryParams, TagsResponse } from '../model/types'
 
 /**
  * 게시물 목록 조회
@@ -93,4 +93,17 @@ export const deletePost = async (id: number): Promise<void> => {
   if (!response.ok) {
     throw new Error('게시물 삭제 실패')
   }
+}
+
+/**
+ * 태그 목록 조회
+ */
+export const fetchTags = async (): Promise<TagsResponse> => {
+  const response = await fetch('/api/posts/tags')
+  
+  if (!response.ok) {
+    throw new Error('태그 목록 가져오기 실패')
+  }
+  
+  return response.json()
 }
