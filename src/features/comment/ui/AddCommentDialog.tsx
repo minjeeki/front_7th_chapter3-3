@@ -1,4 +1,3 @@
-import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, Textarea, Button } from '@/shared/ui'
 import type { CreateCommentDto } from '@/entities/comment/model'
 

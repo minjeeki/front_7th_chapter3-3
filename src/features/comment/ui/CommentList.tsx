@@ -1,4 +1,3 @@
-import React from 'react'
 import { Edit2, Plus, ThumbsUp, Trash2 } from 'lucide-react'
 import { Button } from '@/shared/ui'
 import type { Comment } from '@/entities/comment/model'

@@ -1,4 +1,3 @@
-import React from 'react'
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/shared/ui'
 import type { User } from '@/entities/user/model'
 
