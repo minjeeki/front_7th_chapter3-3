@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { fetchPostsByTag } from '@/entities/post/api'
 import { fetchUsers } from '@/entities/user/api'
 import type { Post } from '@/entities/post/model'
@@ -60,6 +60,15 @@ export const usePostFilter = ({
       setLoading(false)
     }
   }
+
+  // selectedTag가 변경될 때 자동으로 게시물 가져오기
+  useEffect(() => {
+    // 초기값이 아닌 경우에만 실행 (초기 렌더링 방지)
+    if (selectedTag && selectedTag !== initialSelectedTag) {
+      fetchPostsByTagHandler(selectedTag)
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [selectedTag])
 
   return {
     selectedTag,
