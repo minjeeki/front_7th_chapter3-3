@@ -1,24 +1,47 @@
+import { useEffect } from "react"
 import { Plus } from "lucide-react"
+import { useLocation } from "react-router-dom"
 import { Button, Card, CardContent, CardHeader, CardTitle } from "@/shared/ui"
 import type { Post } from "@/entities/post/model"
-import { usePostsManager, AddPostDialog, EditPostDialog } from "@/features/post"
-import { useCommentManagement, AddCommentDialog, EditCommentDialog } from "@/features/comment"
-import { useUserInfo, UserModal } from "@/features/user"
+import { AddPostDialog, EditPostDialog } from "@/features/post"
+import { AddCommentDialog, EditCommentDialog } from "@/features/comment"
+import { UserModal } from "@/features/user"
 import { PostTable } from "@/widgets/post-table"
 import { PostDetailDialog } from "@/widgets/post-detail"
 import { PostControls } from "@/widgets/post-controls"
 import { Pagination } from "@/widgets/pagination"
+import { usePostsStore, useCommentsStore, useUserStore, useURLSync } from "@/app/stores"
+import { parseURLParams } from "@/shared/lib"
 
 const PostsManager = () => {
-  // 모든 게시물 관련 로직을 하나의 훅으로 통합
-  const postsManager = usePostsManager()
-  const commentManagement = useCommentManagement()
-  const userInfo = useUserInfo()
+  const location = useLocation()
+
+  // Zustand 스토어 사용
+  const postsStore = usePostsStore()
+  const commentsStore = useCommentsStore()
+  const userStore = useUserStore()
+
+  // URL 동기화
+  useURLSync()
+
+  // 초기화: URL 파라미터에서 초기값 설정 및 데이터 로드
+  useEffect(() => {
+    const params = parseURLParams(location.search)
+    postsStore.initialize({
+      skip: params.skip,
+      limit: params.limit,
+      search: params.search,
+      sortBy: params.sortBy,
+      sortOrder: params.sortOrder,
+      tag: params.tag,
+    })
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   // 게시물 상세 보기 핸들러
   const handlePostDetailClick = (post: Post) => {
-    postsManager.openPostDetail(post)
-    commentManagement.fetchComments(post.id)
+    postsStore.openPostDetail(post)
+    commentsStore.fetchComments(post.id)
   }
 
   return (
@@ -26,7 +49,7 @@ const PostsManager = () => {
       <CardHeader>
         <CardTitle className="flex items-center justify-between">
           <span>게시물 관리자</span>
-          <Button onClick={() => postsManager.postManagement.setShowAddDialog(true)}>
+          <Button onClick={() => postsStore.setShowAddDialog(true)}>
             <Plus className="w-4 h-4 mr-2" />
             게시물 추가
           </Button>
@@ -36,108 +59,108 @@ const PostsManager = () => {
         <div className="flex flex-col gap-4">
           {/* 검색 및 필터 컨트롤 */}
           <PostControls
-            searchQuery={postsManager.postSearch.searchQuery}
-            onSearchChange={postsManager.postSearch.setSearchQuery}
-            onSearch={postsManager.postSearch.searchPosts}
-            selectedTag={postsManager.postFilter.selectedTag}
-            onTagChange={postsManager.postFilter.setSelectedTag}
-            sortBy={postsManager.postFilter.sortBy}
-            onSortByChange={postsManager.postFilter.setSortBy}
-            sortOrder={postsManager.postFilter.sortOrder}
-            onSortOrderChange={postsManager.postFilter.setSortOrder}
-            tags={postsManager.tags}
+            searchQuery={postsStore.searchQuery}
+            onSearchChange={postsStore.setSearchQuery}
+            onSearch={postsStore.searchPosts}
+            selectedTag={postsStore.selectedTag}
+            onTagChange={postsStore.setSelectedTag}
+            sortBy={postsStore.sortBy}
+            onSortByChange={postsStore.setSortBy}
+            sortOrder={postsStore.sortOrder}
+            onSortOrderChange={postsStore.setSortOrder}
+            tags={postsStore.tags}
           />
 
           {/* 게시물 테이블 */}
-          {postsManager.loading ? (
+          {postsStore.loading ? (
             <div className="flex justify-center p-4">로딩 중...</div>
           ) : (
             <PostTable
-              posts={postsManager.posts}
-              searchQuery={postsManager.postSearch.searchQuery}
-              selectedTag={postsManager.postFilter.selectedTag}
-              onTagClick={postsManager.postFilter.setSelectedTag}
-              onUserClick={userInfo.openUserModal}
+              posts={postsStore.posts}
+              searchQuery={postsStore.searchQuery}
+              selectedTag={postsStore.selectedTag}
+              onTagClick={postsStore.setSelectedTag}
+              onUserClick={userStore.openUserModal}
               onDetailClick={handlePostDetailClick}
               onEditClick={(post) => {
-                postsManager.postManagement.setSelectedPost(post)
-                postsManager.postManagement.setShowEditDialog(true)
+                postsStore.setSelectedPost(post)
+                postsStore.setShowEditDialog(true)
               }}
-              onDeleteClick={postsManager.postManagement.deletePost}
+              onDeleteClick={postsStore.deletePost}
             />
           )}
 
           {/* 페이지네이션 */}
           <Pagination
-            limit={postsManager.postPagination.limit}
-            onLimitChange={postsManager.postPagination.setLimit}
-            canGoPrevious={postsManager.postPagination.canGoPrevious}
-            canGoNext={postsManager.postPagination.canGoNext}
-            onPrevious={postsManager.postPagination.goToPreviousPage}
-            onNext={postsManager.postPagination.goToNextPage}
+            limit={postsStore.limit}
+            onLimitChange={postsStore.setLimit}
+            canGoPrevious={postsStore.canGoPrevious()}
+            canGoNext={postsStore.canGoNext()}
+            onPrevious={postsStore.goToPreviousPage}
+            onNext={postsStore.goToNextPage}
           />
         </div>
       </CardContent>
 
       {/* 게시물 추가 대화상자 */}
       <AddPostDialog
-        open={postsManager.postManagement.showAddDialog}
-        onOpenChange={postsManager.postManagement.setShowAddDialog}
-        newPost={postsManager.postManagement.newPost}
-        setNewPost={postsManager.postManagement.setNewPost}
-        onAdd={postsManager.postManagement.addPost}
+        open={postsStore.showAddDialog}
+        onOpenChange={postsStore.setShowAddDialog}
+        newPost={postsStore.newPost}
+        setNewPost={postsStore.setNewPost}
+        onAdd={postsStore.addPost}
       />
 
       {/* 게시물 수정 대화상자 */}
       <EditPostDialog
-        open={postsManager.postManagement.showEditDialog}
-        onOpenChange={postsManager.postManagement.setShowEditDialog}
-        selectedPost={postsManager.postManagement.selectedPost}
-        setSelectedPost={postsManager.postManagement.setSelectedPost}
-        onUpdate={postsManager.postManagement.updatePost}
+        open={postsStore.showEditDialog}
+        onOpenChange={postsStore.setShowEditDialog}
+        selectedPost={postsStore.selectedPost}
+        setSelectedPost={postsStore.setSelectedPost}
+        onUpdate={postsStore.updatePost}
       />
 
       {/* 댓글 추가 대화상자 */}
       <AddCommentDialog
-        open={commentManagement.showAddDialog}
-        onOpenChange={commentManagement.setShowAddDialog}
-        newComment={commentManagement.newComment}
-        setNewComment={commentManagement.setNewComment}
-        onAdd={commentManagement.addComment}
+        open={commentsStore.showAddDialog}
+        onOpenChange={commentsStore.setShowAddDialog}
+        newComment={commentsStore.newComment}
+        setNewComment={commentsStore.setNewComment}
+        onAdd={commentsStore.addComment}
       />
 
       {/* 댓글 수정 대화상자 */}
       <EditCommentDialog
-        open={commentManagement.showEditDialog}
-        onOpenChange={commentManagement.setShowEditDialog}
-        selectedComment={commentManagement.selectedComment}
-        setSelectedComment={commentManagement.setSelectedComment}
-        onUpdate={commentManagement.updateComment}
+        open={commentsStore.showEditDialog}
+        onOpenChange={commentsStore.setShowEditDialog}
+        selectedComment={commentsStore.selectedComment}
+        setSelectedComment={commentsStore.setSelectedComment}
+        onUpdate={commentsStore.updateComment}
       />
 
       {/* 게시물 상세 보기 대화상자 */}
       <PostDetailDialog
-        open={postsManager.showPostDetailDialog}
-        onOpenChange={postsManager.setShowPostDetailDialog}
-        post={postsManager.postManagement.selectedPost}
+        open={postsStore.showPostDetailDialog}
+        onOpenChange={postsStore.setShowPostDetailDialog}
+        post={postsStore.selectedPost}
         comments={
-          postsManager.postManagement.selectedPost
-            ? commentManagement.comments[postsManager.postManagement.selectedPost.id] || []
+          postsStore.selectedPost
+            ? commentsStore.comments[postsStore.selectedPost.id] || []
             : []
         }
-        searchQuery={postsManager.postSearch.searchQuery}
-        onAddCommentClick={commentManagement.openAddDialog}
-        onEditCommentClick={commentManagement.openEditDialog}
-        onDeleteCommentClick={commentManagement.deleteComment}
-        onLikeCommentClick={commentManagement.likeComment}
+        searchQuery={postsStore.searchQuery}
+        onAddCommentClick={commentsStore.openAddDialog}
+        onEditCommentClick={commentsStore.openEditDialog}
+        onDeleteCommentClick={commentsStore.deleteComment}
+        onLikeCommentClick={commentsStore.likeComment}
       />
 
       {/* 사용자 모달 */}
       <UserModal
-        open={userInfo.showUserModal}
-        onOpenChange={userInfo.setShowUserModal}
-        user={userInfo.selectedUser}
-        loading={userInfo.loading}
+        open={userStore.showUserModal}
+        onOpenChange={userStore.setShowUserModal}
+        user={userStore.selectedUser}
+        loading={userStore.loading}
       />
     </Card>
   )
