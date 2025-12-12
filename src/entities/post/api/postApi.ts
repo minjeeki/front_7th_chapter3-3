@@ -1,4 +1,4 @@
-import type { Post, CreatePostDto, UpdatePostDto, PostsResponse, PostsQueryParams, TagsResponse } from '../model/types'
+import type { Post, CreatePostDto, UpdatePostDto, PostsResponse, PostsQueryParams, TagsResponse } from '@/entities/post/model/types'
 
 /**
  * 게시물 목록 조회

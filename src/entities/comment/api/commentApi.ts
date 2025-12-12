@@ -1,4 +1,4 @@
-import type { Comment, CreateCommentDto, UpdateCommentDto, CommentsResponse } from '../model/types'
+import type { Comment, CreateCommentDto, UpdateCommentDto, CommentsResponse } from '@/entities/comment/model/types'
 
 /**
  * 게시물별 댓글 조회

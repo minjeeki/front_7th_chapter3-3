@@ -1,4 +1,4 @@
-import type { User, UsersResponse, UsersQueryParams } from '../model/types'
+import type { User, UsersResponse, UsersQueryParams } from '@/entities/user/model/types'
 
 /**
  * 단일 사용자 조회
