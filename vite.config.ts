@@ -4,6 +4,7 @@ import path from "path"
 
 // https://vite.dev/config/
 export default defineConfig({
+  base: process.env.NODE_ENV === "production" ? "/front_lite_chapter3-3/" : "/",
   plugins: [react()],
   resolve: {
     alias: {
